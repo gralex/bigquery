@@ -1,0 +1,5 @@
+### console command to deploy a cloud function named 'my_function4' for a function main.py
+
+gcloud functions deploy my_function4 --entry-point read_google_sheets --runtime python311 --trigger-http --allow-unauthenticated
+
+### main.py file 
