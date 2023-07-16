@@ -1,3 +1,5 @@
+--- automated daily scheduler
+
 select * from
 
 (
@@ -53,8 +55,67 @@ ecommerce.transaction_id,
 (select value.string_value from unnest(event_params) where key = 'session_engaged') as session_engaged,
 (select value.int_value from unnest(event_params) where key = 'engagement_time_msec') as engagement_time_msec,
 
---- specify ga4 dataset/table + start date
- FROM `focal-slice-391119.analytics_288530684.events_*`, 
+ FROM `%%BQ_PROJECT_ID%%.%%BQ_DATASET_NAME%%_*`, 
  unnest(items) as items
    where _table_suffix between FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY)) and FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY))
+)
+union all
+(SELECT 
+    parse_date('%Y%m%d',event_date) as date,
+user_pseudo_id,
+event_timestamp,
+event_name,
+(select value.string_value from unnest(event_params) where key = 'variant_id') as variant_id,
+user_first_touch_timestamp,
+device.category as device_category,
+device.mobile_brand_name device_mobile_brand_name,
+device.operating_system device_operating_system,
+device.language device_language,
+device.web_info.hostname hostname,
+geo.country country,
+geo.region region,
+geo.city city,
+geo.sub_continent sub_continent,
+geo.metro metro,
+device.browser browser,
+traffic_source.source,
+traffic_source.medium,
+traffic_source.name campaign,
+(select value.string_value from unnest(event_params) where key = 'content_group') as content_group,
+(select value.string_value from unnest(event_params) where key = 'page_location') as page_location,
+(select value.string_value from unnest(event_params) where key = 'page_title') as page_title,
+  (select value.int_value from unnest(event_params) where key = 'entrances') as entrances,
+
+case when (select value.int_value from unnest(event_params) where event_name = 'page_view' and key = 'entrances') = 1 then (select value.string_value from unnest(event_params) where event_name = 'page_view' and key = 'page_location') end as landing_page,
+(select value.string_value from unnest(event_params) where key = 'element_location') as element_location,
+(select value.string_value from unnest(event_params) where key = 'element_description') as element_description,
+(select value.string_value from unnest(event_params) where key = 'element_type') as element_type,
+(select value.string_value from unnest(event_params) where key = 'element_location2') as element_location2,
+(select value.int_value from unnest(event_params) where key = 'percent_scrolled') as percent_scrolled,
+if(event_name = 'purchase', cast((select value.int_value from unnest(event_params) where key = 'coupon') as string),(select key from unnest(event_params)where key = 'coupon'))  as coupon,
+(select value.int_value from unnest(event_params) where key = 'tax') as tax,
+(select value.double_value from unnest(event_params) where key = 'value') as value,
+(select value.string_value from unnest(event_params) where key = 'shipping_tier') as shipping_tier,
+(select value.string_value from unnest(event_params) where key = 'payment_type') as payment_type,
+(select value.string_value from unnest(event_params) where key = 'currency') as currency,
+---items and ecom
+null as item_id,
+null as item_name,
+null as price,
+null as item_revenue,
+null as quantity,
+user_ltv.revenue,
+ecommerce.total_item_quantity,
+ecommerce.purchase_revenue,
+ecommerce.transaction_id,
+(select value.int_value from unnest(event_params) where key = 'ga_session_number') as ga_session_number,
+(select value.int_value from unnest(event_params) where key = 'ga_session_id') as ga_session_id,
+(select value.string_value from unnest(event_params) where key = 'session_engaged') as session_engaged,
+(select value.int_value from unnest(event_params) where key = 'engagement_time_msec') as engagement_time_msec,
+
+--- specify ga4 dataset/table + start date
+
+ FROM `%%BQ_PROJECT_ID%%.%%BQ_DATASET_NAME%%_*`
+   where _table_suffix between FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY)) and FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY))
+)
 )
