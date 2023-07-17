@@ -1,0 +1,81 @@
+ 
+WITH
+  a AS (
+  SELECT
+    date,
+    user_pseudo_id,
+    variant_id
+  FROM
+    `%%full_bq_simple_table_name%%`
+  WHERE
+    event_name = 'experiment_impression'
+
+    ---- specify experiment id and experiment start date
+    AND variant_id LIKE ('%%%exp_id%%%')
+    and date >= '%%exp_start_date%%'
+  GROUP BY
+    1,
+    2,
+    3),
+  b AS (
+  SELECT
+    date,
+    event_name,
+    device_category,
+    country,
+    SOURCE,
+    medium,
+    campaign,
+    page_location,
+    hostname,
+    content_group,
+    element_location,
+    element_location2,
+    element_description,
+    element_type,
+    percent_scrolled,
+    value,
+    currency,
+    item_id,
+    item_name,
+    transaction_id,
+    user_pseudo_id,
+    ga_session_id
+  FROM
+    `%%full_bq_simple_table_name%%`
+    
+        ---- specify experiment start date
+    where date  >= '%%exp_start_date%%'
+)
+
+SELECT
+a.variant_id as experiment_variation,
+a.date as experiment_date,
+  b.user_pseudo_id as user_pseudo_id,
+   b.date as date,
+    b.event_name as event_name,
+    device_category,
+    country,
+    source,
+    medium,
+    campaign,
+    page_location,
+    hostname,
+    content_group,
+    element_location,
+    element_location2,
+    element_description,
+    element_type,
+    percent_scrolled,
+    value,
+    currency,
+    item_id,
+    item_name,
+    transaction_id,
+    ga_session_id
+FROM
+  a
+LEFT JOIN
+  b
+ON
+  a.user_pseudo_id = b.user_pseudo_id
