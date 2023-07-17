@@ -1,0 +1,10 @@
+SELECT
+  experiment_variation,
+count (distinct user_pseudo_id) as users,
+count (distinct transactions) as transactions,
+sum(revenue) as revenue,
+FROM
+
+`%%table_exp_by_user_pseudo_id%%`
+
+group by 1
