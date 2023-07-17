@@ -1,11 +1,22 @@
 WITH
   purchase_values AS (
   SELECT
+    ---date,
+    transaction_id,
+   --- device_category,
+   --- source,
+   --- medium,
+   --- campaign,
     revenue AS revenue
   FROM (
     SELECT
-
+    ---  date,
+    ---  device_category,
+    ---source,
+    ---medium,
+    ---campaign,
     transaction_id,
+     -- user_pseudo_id,
       SUM(CASE
           WHEN event_name = "purchase" THEN value
       END
@@ -21,6 +32,7 @@ WITH
           OR NOT transaction_id = "(not set)"
           OR item_id IS NOT NULL)
         AND event_name = "purchase" 
+    ---and date >= PARSE_DATE("%Y%m%d", @DS_START_DATE) and date <= PARSE_DATE("%Y%m%d", @DS_END_DATE)
     ) AS subquery
     WHERE
       row_number = 1
@@ -51,7 +63,7 @@ hostname,
   FROM
     `%%full_bq_simple_table_name%%`
   GROUP BY
-    1,2,3,4,5,6,7,8)
+    1,2,3,4,5,6,7,8,9,10)
 SELECT
   data.date,
     experiment_variation,
