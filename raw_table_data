@@ -1,5 +1,3 @@
---- automated daily scheduler
-
 select * from
 
 (
