@@ -55,7 +55,7 @@ ecommerce.transaction_id,
 
  FROM `%%BQ_DB_LOCATION%%_*`, 
  unnest(items) as items
-   where _table_suffix between FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY)) and FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
+   where _table_suffix between %%PERIOD_START%% and FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
 )
 union all
 (SELECT 
@@ -114,6 +114,6 @@ ecommerce.transaction_id,
 --- specify ga4 dataset/table + start date
 
  FROM `%%BQ_DB_LOCATION%%_*`
-   where _table_suffix between FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY)) and FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
+   where _table_suffix between %%PERIOD_START%% and FORMAT_DATE("%Y%m%d", DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
 )
 )
